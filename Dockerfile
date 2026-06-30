@@ -8,11 +8,9 @@ USER 1001
 RUN npm install
 RUN npm run build
 
-FROM alpine:3.19 AS SBOM
+FROM aquasec/trivy:0.58.1 AS SBOM
 WORKDIR /
 ADD . /SBOM
-RUN apk add --no-cache curl
-RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.48.3
 RUN trivy fs --format spdx-json --output /sbom.spdx.json /SBOM
 RUN trivy sbom /sbom.spdx.json --severity UNKNOWN,HIGH,CRITICAL --exit-code 1
 
